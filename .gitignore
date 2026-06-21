@@ -1,6 +1,3 @@
 .DS_Store
-*.swp
-*.swo
-*~
-.idea/
-.vscode/
+__pycache__/
+*.py[cod]

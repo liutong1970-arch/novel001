@@ -1,192 +1,102 @@
-# 文心 Wenxin
+# wenxin-v6 — 番茄中文网小说创作工作流
 
-> 出自《文心雕龙》："夫文心者，言为文之用心也。"
+wenxin-v6 是重建后的串行小说生产线，目标是让作品更符合番茄中文网的吸量、留存、追读和低质治理要求。
 
-**文心** 是一条完整的中文小说写作生产线，基于 [Claude Code](https://docs.anthropic.com/en/docs/claude-code) 技能系统构建。内置去AI味引擎、三维编织写作法、多Agent协作审稿系统。
+v6 不承诺必然爆款。它提供的是严格流程：先确认承诺，再设计黄金三章，再写章，再质检，再追踪，再复盘。
 
-覆盖从选题到成品的全流程：
+## 核心变化
 
-```
-选题 → 设定 → 大纲 → 正文 → 去AI味 → 审稿 → 输出
-```
+- 从旧追读模型升级为“五维模型”：突发性、困惑度、信息熵、追读力、平台留存力。
+- 架构采用 L0-L7：理论内核、创作律、风格库、开书策略、章级追读、长线资产、质量治理、数据复盘。
+- 统一脚本口径：重复段落、POV、钩子、信息密度和追读力检测全部内嵌在 `scripts/naturalness_scan.py`。
+- 新增开书策略、平台增长模型、世界观、伏笔、长线规划、对标分析、情绪追踪、素材触发和低质风险治理。
 
-## ✨ 功能亮点
+## 工作流
 
-### 三维编织写作法
-
-每个场景在同一段落内交织三个维度：
-
-```
-发生（叙事） + 感知（感官） + 反应（身体+动作）
-```
-
-- 每段一句话，≤ 60字
-- 对话独立成段，无标签
-- 每章5个场景，共2000-2500字
-
-### 去AI味引擎
-
-三层检查机制，消灭AI腔：
-
-1. **qu-ai-wei 51类模式**：内容模式、语言模式、修辞模式、翻译腔等9大类
-2. **小说专用规则**：对话口语化、结尾去升华、禁词扫描
-3. **过度修正三问**：防止改写过度，保持原文风格
-
-### 素材搜索扩写
-
-字数不足时自动触发网络素材搜索，使用 Scrapling 抓取真实素材，融入三维编织格式。
-
-### 多Agent协作
-
-| 角色 | 模型 | 职责 |
-|------|------|------|
-| 文心写手 | Sonnet | 正文创作、三维编织 |
-| 文心架构师 | Opus | 大纲设计、结构审查 |
-| 文心角色师 | Sonnet | 角色设计、语言画像 |
-| 文心检查员 | Haiku | 一致性检查 |
-| 文心润色师 | Sonnet | 去AI味 |
-| 文心素材员 | Sonnet | 网络素材搜索 |
-
-## 📦 安装
-
-### 方式一：手动安装（推荐）
-
-将技能目录复制到 Claude Code 的技能路径：
-
-```bash
-# 个人级别（所有项目可用）
-git clone https://github.com/tony98/wenxin.git
-cp -r wenxin ~/.claude/skills/wenxin
-
-# 项目级别（仅当前项目可用）
-git clone https://github.com/tony98/wenxin.git
-cp -r wenxin .claude/skills/wenxin
+```text
+选题/对标
+  -> 书名/简介/标签承诺
+  -> 开书体检/黄金三章
+  -> 前10章追读梯度
+  -> 卷纲/章纲/细纲
+  -> 正文三维编织
+  -> 结构 + 追读 + 自然度 + 低质风险质检
+  -> 追踪表更新
+  -> 数据复盘
 ```
 
-### 方式二：符号链接
-
-```bash
-git clone https://github.com/tony98/wenxin.git
-ln -s "$(pwd)/wenxin" ~/.claude/skills/wenxin
-```
-
-安装后重启 Claude Code 即可使用。
-
-## 🚀 快速开始
-
-```bash
-# 在 Claude Code 中使用
-/wenxin                    # 查看状态和可用命令
-/wenxin 新建 仙侠传奇      # 创建新项目
-/wenxin 写第1章            # 写第一章（完整流程）
-/wenxin 去AI味             # 去除AI写作痕迹
-/wenxin 审稿               # 多维度审查
-```
-
-### 完整写作流程示例
-
-```
-> /wenxin 新建 仙侠传奇
-
-✅ 项目已创建：仙侠传奇/
-   ├── 设定/
-   ├── 大纲/
-   ├── 正文/
-   ├── 追踪/
-   └── 参考资料/
-
-> /wenxin 设定
-
-（进入设定构建流程：世界观、角色、势力、关系）
-
-> /wenxin 大纲
-
-（进入大纲设计流程：总纲、卷纲、细纲）
-
-> /wenxin 写第1章
-
-Step 1: 加载上下文...
-Step 2: 三维编织写作...
-Step 3: 去AI味检查...
-Step 4: 字数验证：2350字 ✅
-Step 5: 更新追踪文件...
-
-✅ 第1章完成
-- 字数：2350字
-- 去AI味：通过
-- 伏笔操作：埋3个
-- 下一章：第2章
-```
-
-## 📁 项目结构
-
-```
-{书名}/
-├── 设定/
-│   ├── 世界观/         # 世界设定文档
-│   ├── 角色/           # 角色卡片（主角/反派/配角）
-│   ├── 势力/           # 势力设定
-│   ├── 关系.md         # 角色关系图谱
-│   └── 题材定位.md     # 题材、卖点、对标分析
-├── 大纲/
-│   ├── 大纲.md         # 总纲
-│   ├── 卷纲/           # 每卷大纲
-│   └── 细纲/
-│       └── 五星细纲/   # 每章细纲
-├── 正文/
-│   └── 第XXX章_章名.md # 章节正文
-├── 追踪/
-│   ├── 伏笔.md         # 伏笔追踪表
-│   ├── 时间线.md       # 事件时间线
-│   ├── 角色状态.md     # 角色当前状态
-│   └── 上下文.md       # 写作进度追踪
-├── 对标/               # 对标作品分析
-└── 参考资料/           # 素材、参考
-```
-
-## 📖 参考文件
-
-技能内置的参考资料（按需加载）：
-
-| 文件 | 内容 |
-|------|------|
-| `references/qu-ai-wei.md` | 去AI味引擎（51类模式详解） |
-| `references/novel-specific.md` | 小说专用规则（对话、结尾、禁词） |
-| `references/material-search.md` | 素材搜索扩写功能 |
-
-## 📋 命令列表
+## 常用命令
 
 | 命令 | 说明 |
-|------|------|
-| `/wenxin` | 查看状态和可用命令 |
-| `/wenxin 新建 [书名]` | 创建新项目 |
-| `/wenxin 选题` | 选题分析 |
-| `/wenxin 设定` | 构建设定 |
-| `/wenxin 大纲` | 设计大纲 |
-| `/wenxin 写第X章` | 写指定章节（完整流程） |
-| `/wenxin 续写` | 继续写下一章 |
-| `/wenxin 去AI味 [文本]` | 去除AI写作痕迹 |
-| `/wenxin 审稿` | 多维度审查 |
-| `/wenxin 状态` | 查看当前进度 |
-| `/wenxin 搜索素材 [关键词]` | 搜索网络素材 |
+| --- | --- |
+| `/wenxin-v6 新建项目` | 创建标准项目与追踪模板 |
+| `/wenxin-v6 开书体检` | 检查书名、简介、标签、第一章承诺 |
+| `/wenxin-v6 爆款对标` | 拆解对标作品的结构、爽点、钩子 |
+| `/wenxin-v6 黄金三章审稿` | 审查前三章留存与追读梯度 |
+| `/wenxin-v6 生成章纲` | 生成带信息增量、爽点、钩子的章纲 |
+| `/wenxin-v6 写第X章` | 执行完整写章流程 |
+| `/wenxin-v6 自然度质检` | 运行本地自然度与追读扫描 |
+| `/wenxin-v6 情绪值检查` | 检查情绪起点、触发事件、终点和外化动作 |
+| `/wenxin-v6 素材搜索` | 搜索或复用真实感官细节，补私人纹理 |
+| `/wenxin-v6 追读复盘` | 检查信息密度、爽点兑现、章末钩子 |
+| `/wenxin-v6 长线规划` | 检查卷间衔接、伏笔、势力和升级曲线 |
+| `/wenxin-v6 低质风险检查` | 检查水化、模板堆砌、逻辑割裂和批量感 |
 
-## 🎯 质量标准
+## 目录结构
 
-| 维度 | 标准 | 检查方式 |
-|------|------|---------|
-| 字数 | 2000-2500字/章 | Python len() |
-| 段落 | ≤ 60字/段 | 逐段检查 |
-| 对话 | 独立成段，无标签 | grep检查 |
-| 禁词 | 0个一级禁词 | 禁词表扫描 |
-| 三维编织 | 每场景3个维度 | 人工检查 |
-| 去AI味 | 通过三问验证 | 人工检查 |
+```text
+wenxin-v6/
+├── SKILL.md
+├── principles.md
+├── references/
+│   ├── platform-growth-model.md
+│   ├── quality-governance.md
+│   ├── fanqie-style.md
+│   ├── fangxiang-style.md
+│   ├── tianmo-style.md
+│   ├── emotion-system.md
+│   ├── material-search-workflow.md
+│   ├── scraped-sensory-details.md
+│   ├── satisfaction-engine.md
+│   ├── hook-cheatsheet.md
+│   ├── naturalness-workflow.md
+│   ├── project-templates/追踪模板.md
+│   └── story-craft/
+│       ├── README.md
+│       ├── opening-strategy.md
+│       ├── story-architecture.md
+│       ├── beat-outline.md
+│       ├── character-engine.md
+│       ├── world-building.md
+│       ├── foreshadowing.md
+│       ├── long-term-planning.md
+│       ├── benchmark-analysis.md
+│       ├── scene-design.md
+│       ├── dialogue-craft.md
+│       ├── revision-checklist.md
+│       ├── patterns.md
+│       ├── core-frameworks.md
+│       ├── source-map.md
+│       ├── cheatsheet.md
+│       ├── glossary.md
+│       └── integrated-fiction-workflow.md
+└── scripts/
+    ├── naturalness_scan.py
+    ├── naturalness_batch_scan.py
+    ├── naturalness_segment_queue.py
+    └── naturalness_pipeline.py
+```
 
-## 📄 许可证
+## 质检顺序
 
-[MIT License](LICENSE)
+1. 结构是否成立。
+2. 信息增量是否达标。
+3. 爽点是否兑现。
+4. 章末钩子是否合格。
+5. POV 是否一致。
+6. 是否重复或水化。
+7. 自然度是否达标。
+8. 情绪连续性和素材纹理是否可靠。
+9. 低质风险是否可接受。
 
-## 🙏 致谢
-
-- [Claude Code](https://docs.anthropic.com/en/docs/claude-code) — 技能运行平台
-- [Agent Skills](https://agentskills.io) — 开放技能标准
-- [《文心雕龙》](https://zh.wikipedia.org/wiki/%E6%96%87%E5%BF%83%E9%9B%95%E9%BE%99) — 命名来源
+任一 P0/P1 级问题出现，先修细纲或结构，不做表层润色。
